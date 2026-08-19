@@ -18,7 +18,12 @@ function isPostgresUrl(url?: string) {
   return !!url && /^postgres(ql)?:\/\//i.test(url);
 }
 
-async function ensureTable(sql: ReturnType<typeof neon>) {
+function getSql() {
+  return neon(process.env.DATABASE_URL as string);
+}
+
+async function ensureTable() {
+  const sql = getSql();
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -61,9 +66,9 @@ export async function createUser(input: {
 
   const url = process.env.DATABASE_URL;
   if (isPostgresUrl(url)) {
-    const sql = neon(url!);
-    await ensureTable(sql);
     try {
+      await ensureTable();
+      const sql = getSql();
       await sql`
         INSERT INTO users (id, username, email, password_hash, created_at)
         VALUES (${user.id}, ${user.username}, ${user.email}, ${user.passwordHash}, ${user.createdAt})
@@ -98,8 +103,8 @@ export async function findUserByLogin(login: string): Promise<UserRecord | null>
   const url = process.env.DATABASE_URL;
 
   if (isPostgresUrl(url)) {
-    const sql = neon(url!);
-    await ensureTable(sql);
+    await ensureTable();
+    const sql = getSql();
     const rows = (await sql`
       SELECT id, username, email, password_hash AS "passwordHash", created_at AS "createdAt"
       FROM users
