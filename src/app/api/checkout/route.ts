@@ -16,7 +16,7 @@ function isPlan(value: unknown): value is Plan {
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.json({ error: "Log in first." }, { status: 401 });
+    return NextResponse.json({ error: "Please log in first." }, { status: 401 });
   }
 
   const secret = process.env.STRIPE_SECRET_KEY;
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: checkout.url });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Checkout failed";
+    const message = err instanceof Error ? err.message : "Checkout failed.";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }
