@@ -31,30 +31,41 @@ const sparks = [
   },
 ];
 
-async function startCheckout(priceKey?: string) {
+async function startCheckout(plan: "creator" | "studio") {
   const res = await fetch("/api/checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ priceId: priceKey }),
+    body: JSON.stringify({ plan }),
   });
-  const data = await res.json();
+
+  let data: { url?: string; error?: string } = {};
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Checkout did not return JSON. Check the /api/checkout route.");
+  }
+
   if (data.url) {
     window.location.href = data.url;
     return;
   }
-  alert(
-    data.error ||
-      "Checkout is ready once you add Stripe keys in Vercel. This demo landing page is live."
+
+  throw new Error(
+    data.error || "Checkout is ready once you add Stripe keys in Vercel."
   );
 }
 
 export default function Home() {
   const [loading, setLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const onPay = async (plan: string) => {
+  const onPay = async (plan: "creator" | "studio") => {
     setLoading(plan);
+    setError(null);
     try {
-      await startCheckout();
+      await startCheckout(plan);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Checkout failed");
     } finally {
       setLoading(null);
     }
@@ -77,7 +88,7 @@ export default function Home() {
             Pricing
           </a>
           <button
-            onClick={() => onPay("nav")}
+            onClick={() => onPay("creator")}
             className="rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
           >
             Start trial
@@ -101,10 +112,10 @@ export default function Home() {
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
-            onClick={() => onPay("hero")}
+            onClick={() => onPay("creator")}
             className="w-full sm:w-auto rounded-full bg-amber-300 px-7 py-3.5 text-zinc-950 font-semibold hover:bg-amber-200 transition"
           >
-            {loading === "hero" ? "Opening checkout…" : "Get tomorrow’s spark — $9/mo"}
+            {loading === "creator" ? "Opening checkout…" : "Get tomorrow’s spark — $9/mo"}
           </button>
           <a
             href="#sample"
@@ -117,6 +128,9 @@ export default function Home() {
           7-day taste. Cancel in one click. Built for people who already pay for
           tools that respect their attention.
         </p>
+        {error ? (
+          <p className="mt-4 text-sm text-rose-300 max-w-xl mx-auto">{error}</p>
+        ) : null}
       </section>
 
       <section id="sample" className="mx-auto max-w-6xl px-6 pb-24">
