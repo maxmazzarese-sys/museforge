@@ -22,7 +22,7 @@ export function validateSignup(input: {
     };
   }
 
-  if (!/[^\s@]+@[^\s@]+\.[^\s@]+/.test(email)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: "Enter a valid email address." };
   }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getSession } from "@/lib/session";
 
 const PLANS = {
   creator: process.env.STRIPE_PRICE_ID,
@@ -13,6 +14,11 @@ function isPlan(value: unknown): value is Plan {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Log in first." }, { status: 401 });
+  }
+
   const secret = process.env.STRIPE_SECRET_KEY;
 
   if (!secret) {
@@ -46,21 +52,22 @@ export async function POST(req: NextRequest) {
     "http://localhost:3000";
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const checkout = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#pricing`,
+      customer_email: session.email,
       allow_promotion_codes: true,
       billing_address_collection: "auto",
       subscription_data: {
         trial_period_days: 7,
-        metadata: { plan },
+        metadata: { plan, userId: session.id },
       },
-      metadata: { plan },
+      metadata: { plan, userId: session.id },
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: checkout.url });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Checkout failed";
     return NextResponse.json({ error: message }, { status: 400 });

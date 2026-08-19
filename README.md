@@ -1,19 +1,13 @@
 # MuseForge
 
-A subscription SaaS for a daily, personalized AI idea.
+Daily AI idea subscription with login, signup, and Stripe checkout.
 
-Repo: https://github.com/maxmazzarese-sys/museforge
+## Auth
 
-## Stripe env vars
+Opening the site asks for login or signup (username, email, password).
+Accounts are saved so people can log back in.
 
-Add these in Vercel:
+- Local: accounts are stored in `data/users.json` (gitignored)
+- Production: set a Postgres `DATABASE_URL` (Neon is simplest) so accounts persist on Vercel
 
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PRICE_ID` — recurring Creator price ($9/mo)
-- `STRIPE_PRICE_ID_STUDIO` — recurring Studio price ($19/mo)
-
-Checkout uses hosted Stripe Checkout in `subscription` mode with a 7-day trial. Plan names (`creator` / `studio`) are mapped on the server. Clients cannot pass raw price IDs.
-
-## Deploy
-
-Import this GitHub repo in Vercel, set the env vars, deploy.
+Also set `AUTH_SECRET` to a long random string.
