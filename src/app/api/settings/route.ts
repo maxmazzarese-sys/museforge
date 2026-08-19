@@ -9,6 +9,7 @@ import {
   readCookieAccounts,
   replaceCookieAccount,
 } from "@/lib/account-store";
+import { sendProductUpdateEmail, sendSparkEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -77,7 +78,7 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json(
           {
             error:
-              "Username must be 3–20 characters and only letters, numbers, or underscore.",
+              "Username must be 3–20 characters and can include only letters, numbers, or underscores.",
           },
           { status: 400 }
         );
@@ -129,7 +130,7 @@ export async function PATCH(req: NextRequest) {
       const ok = await bcrypt.compare(currentPassword, record.passwordHash);
       if (!ok) {
         return NextResponse.json(
-          { error: "Current password is wrong." },
+          { error: "Your current password is incorrect." },
           { status: 400 }
         );
       }
@@ -143,7 +144,29 @@ export async function PATCH(req: NextRequest) {
       email: record.email,
     });
 
-    return NextResponse.json({ user: publicUser(record) });
+    let emailError: string | undefined;
+    if (
+      body.settings &&
+      ("emailDaily" in body.settings || "emailProduct" in body.settings)
+    ) {
+      const settings = normalizeSettings(record.settings);
+      if (settings.emailDaily) {
+        const spark = await sendSparkEmail({
+          to: record.email,
+          username: settings.displayName || record.username,
+        });
+        if (!spark.ok) emailError = spark.error;
+      }
+      if (settings.emailProduct) {
+        const update = await sendProductUpdateEmail({ to: record.email });
+        if (!update.ok) emailError = update.error;
+      }
+    }
+
+    return NextResponse.json({
+      user: publicUser(record),
+      emailError,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Could not save settings.";
     return NextResponse.json({ error: message }, { status: 500 });
