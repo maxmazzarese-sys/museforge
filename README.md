@@ -1,37 +1,19 @@
 # MuseForge
 
-A subscription SaaS for a daily, personalized AI idea — built so paying feels obvious.
+A subscription SaaS for a daily, personalized AI idea.
 
-Live repo: https://github.com/maxmazzarese-sys/museforge
+Repo: https://github.com/maxmazzarese-sys/museforge
 
-## Why this product
+## Stripe env vars
 
-2026 micro-SaaS research shows the products people actually pay for are:
-- Narrow (one job, not another general chatbot)
-- Recurring in the user's calendar (daily ritual)
-- Tied to output or money (an idea they can ship today)
-- Cheap relative to the alternative (less than one freelance hour)
+Add these in Vercel:
 
-MuseForge is a morning spark: one usable idea, prompt, or wedge tailored to the niches you pick.
+- `STRIPE_SECRET_KEY`
+- `STRIPE_PRICE_ID` — recurring Creator price ($9/mo)
+- `STRIPE_PRICE_ID_STUDIO` — recurring Studio price ($19/mo)
 
-## Stack
+Checkout uses hosted Stripe Checkout in `subscription` mode with a 7-day trial. Plan names (`creator` / `studio`) are mapped on the server. Clients cannot pass raw price IDs.
 
-- Next.js App Router + Tailwind v4
-- Stripe Checkout in `subscription` mode
-- Vercel hosting
+## Deploy
 
-## Deploy on Vercel
-
-1. Import this GitHub repo in [Vercel](https://vercel.com/new).
-2. Add environment variables:
-   - `STRIPE_SECRET_KEY`
-   - `STRIPE_PRICE_ID` (a recurring Price from the Stripe Dashboard)
-3. Deploy. Subscribe buttons open hosted Stripe Checkout.
-4. Optional: add a webhook later for access control (`checkout.session.completed`, `customer.subscription.*`).
-
-## Local
-
-```bash
-npm install
-npm run dev
-```
+Import this GitHub repo in Vercel, set the env vars, deploy.
