@@ -66,3 +66,19 @@ export function findInAccounts(users: UserRecord[], login: string) {
     ) || null
   );
 }
+
+export function findAccountById(users: UserRecord[], id: string) {
+  return users.find((item) => item.id === id) || null;
+}
+
+export async function replaceCookieAccount(user: UserRecord) {
+  const users = await readCookieAccounts();
+  const next = users.filter((item) => item.id !== user.id);
+  next.push(user);
+  await writeCookieAccounts(next);
+}
+
+export async function removeCookieAccount(id: string) {
+  const users = await readCookieAccounts();
+  await writeCookieAccounts(users.filter((item) => item.id !== id));
+}
