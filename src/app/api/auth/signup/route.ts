@@ -7,6 +7,7 @@ import {
   readCookieAccounts,
   upsertCookieAccount,
 } from "@/lib/account-store";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -41,12 +42,19 @@ export async function POST(req: NextRequest) {
       email: result.user.email,
     });
 
+    const email = await sendWelcomeEmail({
+      to: result.user.email,
+      username: result.user.username,
+    });
+
     return NextResponse.json({
       user: {
         id: result.user.id,
         username: result.user.username,
         email: result.user.email,
       },
+      emailSent: email.ok,
+      emailError: email.ok ? undefined : email.error,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Signup failed";
