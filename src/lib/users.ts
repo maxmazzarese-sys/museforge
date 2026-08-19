@@ -12,7 +12,10 @@ export type UserRecord = {
   createdAt: string;
 };
 
-const FILE_PATH = path.join(process.cwd(), "data", "users.json");
+const FILE_PATH = path.join(
+  process.env.VERCEL ? "/tmp" : path.join(process.cwd(), "data"),
+  "users.json"
+);
 
 function isPostgresUrl(url?: string) {
   return !!url && /^postgres(ql)?:\/\//i.test(url);
@@ -94,7 +97,11 @@ export async function createUser(input: {
     return { error: "That username or email is already taken." };
   }
   users.push(user);
-  await writeFileStore(users);
+  try {
+    await writeFileStore(users);
+  } catch {
+    // Vercel filesystem is read-only. Cookie store is the fallback.
+  }
   return { user };
 }
 
