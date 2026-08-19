@@ -72,10 +72,16 @@ export default function AccountMenu() {
               <p className="truncate text-xs text-zinc-400">{user.email}</p>
             </div>
           </div>
+          <a
+            href="/settings"
+            className="mt-3 block w-full rounded-xl border border-white/10 px-3 py-2.5 text-center text-sm text-zinc-200 hover:bg-white/10"
+          >
+            Settings
+          </a>
           <button
             type="button"
             onClick={logout}
-            className="mt-3 w-full rounded-xl border border-white/10 px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/10"
+            className="mt-2 w-full rounded-xl border border-white/10 px-3 py-2.5 text-sm text-zinc-200 hover:bg-white/10"
           >
             Log out
           </button>
