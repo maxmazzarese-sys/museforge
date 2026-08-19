@@ -22,15 +22,15 @@ export default function SignupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Could not create the account.");
+        setError(data.error || `Could not create the account (${res.status}).`);
         return;
       }
       router.push("/");
       router.refresh();
     } catch {
-      setError("Could not create the account. Try again.");
+      setError("Could not reach the server. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
