@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import AccountMenu from "@/components/AccountMenu";
 
 const niches = [
   "Content & newsletters",
@@ -56,21 +57,6 @@ async function startCheckout(plan: "creator" | "studio") {
 export default function Home() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.user?.username) setUsername(data.user.username);
-      })
-      .catch(() => {});
-  }, []);
-
-  async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/login";
-  }
 
   const onPay = async (plan: "creator" | "studio") => {
     setLoading(plan);
@@ -91,13 +77,13 @@ export default function Home() {
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-amber-300 text-zinc-950 font-black">M</span>
           <span className="text-lg font-semibold tracking-tight">MuseForge</span>
         </div>
-        <nav className="hidden sm:flex items-center gap-6 text-sm text-zinc-400">
-          <a href="#how" className="hover:text-white">How it works</a>
-          <a href="#pricing" className="hover:text-white">Pricing</a>
-          {username ? <span className="text-zinc-200">@{username}</span> : null}
-          <button onClick={() => onPay("creator")} className="rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20">Start trial</button>
-          <button onClick={logout} className="rounded-full border border-white/15 px-4 py-2 text-white hover:bg-white/10">Log out</button>
-        </nav>
+        <div className="flex items-center gap-3">
+          <nav className="hidden sm:flex items-center gap-6 text-sm text-zinc-400">
+            <a href="#how" className="hover:text-white">How it works</a>
+            <a href="#pricing" className="hover:text-white">Pricing</a>
+          </nav>
+          <AccountMenu />
+        </div>
       </header>
 
       <section className="mx-auto max-w-5xl px-6 pb-20 pt-10 text-center">
