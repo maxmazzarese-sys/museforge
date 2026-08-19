@@ -11,8 +11,8 @@ export default function WelcomePage() {
           Your first spark arrives tomorrow at 7:14 AM.
         </h1>
         <p className="text-zinc-400 text-lg leading-relaxed">
-          MuseForge just reserved a seat in your morning. Check your email for
-          the onboarding note and pick your first three niches.
+          MuseForge reserved a place in your morning. Check your email for the
+          onboarding note, then pick your first three niches.
         </p>
         <Link
           href="/"

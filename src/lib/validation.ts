@@ -18,7 +18,7 @@ export function validateSignup(input: {
   if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
     return {
       error:
-        "Username must be 3–20 characters and only letters, numbers, or underscore.",
+        "Username must be 3–20 characters and can include only letters, numbers, or underscores.",
     };
   }
 
