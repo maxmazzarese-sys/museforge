@@ -7,7 +7,7 @@ function getClient() {
 }
 
 function fromAddress() {
-  return process.env.EMAIL_FROM || "MuseForge <beth.t@example.com>";
+  return process.env.EMAIL_FROM || "MuseForge <onboarding@resend.dev>";
 }
 
 function wrap(title: string, body: string) {
