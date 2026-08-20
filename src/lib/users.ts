@@ -4,6 +4,7 @@ import path from "path";
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
 import { DEFAULT_SETTINGS, type UserSettings } from "@/lib/settings";
+import { FREE_SUB, type Subscription } from "@/lib/subscription";
 
 export type UserRecord = {
   id: string;
@@ -12,6 +13,7 @@ export type UserRecord = {
   passwordHash: string;
   createdAt: string;
   settings?: UserSettings;
+  subscription?: Subscription;
 };
 
 const FILE_PATH = path.join(
@@ -68,6 +70,7 @@ export async function createUser(input: {
     passwordHash,
     createdAt: new Date().toISOString(),
     settings: DEFAULT_SETTINGS,
+    subscription: FREE_SUB,
   };
 
   const url = process.env.DATABASE_URL;

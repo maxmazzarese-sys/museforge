@@ -6,6 +6,7 @@ type SessionUser = {
   id: string;
   username: string;
   email: string;
+  subscription?: { plan: string; status: string };
 };
 
 export default function AccountMenu() {
@@ -70,6 +71,12 @@ export default function AccountMenu() {
             <div className="min-w-0">
               <p className="truncate font-medium">@{user.username}</p>
               <p className="truncate text-xs text-zinc-400">{user.email}</p>
+              <p className="text-xs text-amber-200">
+                {user.subscription?.status === "trialing" ||
+                user.subscription?.status === "active"
+                  ? user.subscription.plan
+                  : "free"}
+              </p>
             </div>
           </div>
           <a
