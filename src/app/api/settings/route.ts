@@ -10,6 +10,7 @@ import {
   replaceCookieAccount,
 } from "@/lib/account-store";
 import { sendProductUpdateEmail, sendSparkEmail } from "@/lib/email";
+import { isUnlocked, normalizeSubscription } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ function publicUser(user: {
   email: string;
   createdAt?: string;
   settings?: ReturnType<typeof normalizeSettings>;
+  subscription?: ReturnType<typeof normalizeSubscription>;
 }) {
   return {
     id: user.id,
@@ -26,6 +28,7 @@ function publicUser(user: {
     email: user.email,
     createdAt: user.createdAt || null,
     settings: normalizeSettings(user.settings),
+    subscription: normalizeSubscription(user.subscription),
   };
 }
 
@@ -150,7 +153,10 @@ export async function PATCH(req: NextRequest) {
       ("emailDaily" in body.settings || "emailProduct" in body.settings)
     ) {
       const settings = normalizeSettings(record.settings);
-      if (settings.emailDaily) {
+      if (settings.emailDaily && !isUnlocked(record.subscription)) {
+        emailError =
+          "Daily spark emails are included in Creator and Studio. Start a trial to unlock them.";
+      } else if (settings.emailDaily) {
         const spark = await sendSparkEmail({
           to: record.email,
           username: settings.displayName || record.username,
