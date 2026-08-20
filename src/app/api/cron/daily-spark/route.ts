@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendSparkEmail } from "@/lib/email";
 import { readCookieAccounts } from "@/lib/account-store";
 import { normalizeSettings } from "@/lib/settings";
+import { isUnlocked } from "@/lib/subscription";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   for (const user of users) {
     const settings = normalizeSettings(user.settings);
-    if (!settings.emailDaily) continue;
+    if (!settings.emailDaily || !isUnlocked(user.subscription)) continue;
     const result = await sendSparkEmail({
       to: user.email,
       username: settings.displayName || user.username,
